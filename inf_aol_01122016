@@ -1,0 +1,400 @@
+Sub getUniqueKeyUS()
+
+Dim formulaText, startRow, maxRow, formulaKey, chfeevalue
+
+startRow = 371
+maxRow = 533
+formulaKey = ""
+
+Do While startRow < maxRow + 1
+
+greyCol = "CE" 'bz
+formulaCol = "BJ" 'be
+rateCol = "BA"
+amountLookupCol = "BH"
+secondaryRateCol = ""
+
+region = "US"
+
+Range(formulaCol & startRow).Select
+chfeevalue = Worksheets(region).Range(greyCol & startRow).Value
+If Worksheets(region).Range(greyCol & startRow).Value > 0 Then
+    'replaceNumber
+    Range(formulaCol & startRow).Select
+    formulaText = ActiveCell.Formula
+    formulaText = replaceNumber(formulaText)
+    If formulaText <> "" Then
+        formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+    End If
+    
+    Range(rateCol & startRow).Select
+    formulaText = ActiveCell.Formula
+    If formulaText <> "" Then
+        'formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+        If InStr(formulaText, "<") > 0 Then
+            formulaKey = formulaKey + "[TIERED]"
+        Else
+            formulaKey = formulaKey + "[FIXED]"
+        End If
+    End If
+    
+    Range(amountLookupCol & startRow).Select
+    formulaText = ActiveCell.Formula
+    formulaText = replaceNumber(formulaText)
+    If formulaText <> "" Then
+        formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+    End If
+If secondaryRateCol <> "" Then
+    Range(secondaryRateCol & startRow).Select
+    formulaText = ActiveCell.Formula
+    If formulaText <> "" Then
+        formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+    End If
+End If
+    
+    Worksheets(region).Range("EG" & startRow).Value = formulaKey
+    Worksheets(region).Range("EG" & startRow).Select
+    formulaKey = ""
+End If
+
+    'Range("Bp" & startRow).Select
+    'formulaText = ActiveCell.Formula
+    'If formulaText <> "" Then
+    '    formulaText = Mid(formulaText, 2, Len(formulaText) - 1)
+    'End If
+    'Range("er" & startRow).Select
+    'Range("er" & startRow).Value = formulaText
+    startRow = startRow + 1
+    Worksheets(region).Range("EG" & startRow).Select
+Loop
+End Sub
+
+Sub getUniqueKeyEMEA()
+
+Dim formulaText, startRow, maxRow, formulaKey, chfeevalue
+
+startRow = 2
+maxRow = 236
+formulaKey = ""
+
+greyCol = "BZ" 'bz
+formulaCol = "BE" 'be
+rateCol = "BA"
+amountLookupCol = "BC"
+secondaryRateCol = "BB"
+
+region = "EMEA"
+
+Do While startRow < maxRow + 1
+
+Range("BE" & startRow).Select
+chfeevalue = Worksheets("EMEA").Range("BZ" & startRow).Value
+If Worksheets("EMEA").Range("BZ" & startRow).Value > 0 Then
+    'replaceNumber
+    Range("BE" & startRow).Select
+    formulaText = ActiveCell.Formula
+    formulaText = replaceNumber(formulaText)
+    If formulaText <> "" Then
+        formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+    End If
+    
+    Range("BA" & startRow).Select
+    formulaText = ActiveCell.Formula
+    If formulaText <> "" Then
+        'formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+        If InStr(formulaText, "<") > 0 Then
+            formulaKey = formulaKey + "[TIERED]"
+        Else
+            formulaKey = formulaKey + "[FIXED]"
+        End If
+    End If
+    
+    Range("BC" & startRow).Select
+    formulaText = ActiveCell.Formula
+    formulaText = replaceNumber(formulaText)
+    If formulaText <> "" Then
+        formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+    End If
+
+    Range("BB" & startRow).Select
+    formulaText = ActiveCell.Formula
+    If formulaText <> "" Then
+        formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+    End If
+    
+    Worksheets("EMEA").Range("EG" & startRow).Value = formulaKey
+    Worksheets("EMEA").Range("EG" & startRow).Select
+    formulaKey = ""
+End If
+
+    'Range("Bp" & startRow).Select
+    'formulaText = ActiveCell.Formula
+    'If formulaText <> "" Then
+    '    formulaText = Mid(formulaText, 2, Len(formulaText) - 1)
+    'End If
+    'Range("er" & startRow).Select
+    'Range("er" & startRow).Value = formulaText
+    startRow = startRow + 1
+    Worksheets("EMEA").Range("EG" & startRow).Select
+Loop
+End Sub
+
+Function replaceNumber(stdTExt)
+    Dim str
+    If InStr(stdTExt, ")") = 0 And InStr(stdTExt, ">") = 0 Then
+    'str = Replace(stdTExt, "/1000", "CPM")
+        str = Replace(stdTExt, 1, "")
+        str = Replace(str, 2, "")
+        str = Replace(str, 3, "")
+        str = Replace(str, 4, "")
+        str = Replace(str, 5, "")
+        str = Replace(str, 6, "")
+        str = Replace(str, 7, "")
+        str = Replace(str, 8, "")
+        str = Replace(str, 9, "")
+        str = Replace(str, 0, "")
+    Else
+        str = stdTExt
+    End If
+    
+    replaceNumber = Trim(str)
+End Function
+Function StripNumber(stdTExt)
+    Dim str As String, i As Integer, b As Integer
+     'strips the number from a longer text string
+    stdTExt = Trim(stdTExt)
+    b = 1
+    For i = Len(stdTExt) To 1 Step -1
+        If IsNumeric(Mid(stdTExt, i, 1)) Then
+            str = Left(stdTExt, Len(stdTExt) - b)
+            b = b + 1
+        'Else: GoTo done
+        End If
+    Next i
+done:
+    StripNumber = Trim(str)
+End Function
+
+
+
+Sub sample_utility()
+'
+' sample_utility Macro
+'
+
+'
+    Range("C4").Select
+    ActiveCell.FormulaR1C1 = "hijk"
+    Range("B9").Select
+    ActiveCell.FormulaR1C1 = "abc"
+    Range("E9").Select
+    ActiveCell.FormulaR1C1 = "=PROPER(RC[-3])"
+    Range("E10").Select
+    ActiveCell.FormulaR1C1 = "=UPPER(R[-1]C)"
+    Range("E11").Select
+End Sub
+
+Sub getUniqueKey()
+    'Workbooks("utility").Activate
+    'Workbooks("11 Nov 2015 Platform Billing EST V2 120115").Activate
+    'Worksheets("sheet names").Activate
+    
+Dim region, fee, greyref, row, startRow
+Dim formulaText, formulaKey, emptyRow, limit, consoleID, feecol
+row = 2
+startRow = 2
+fee = "start"
+
+Do While fee <> ""
+    'loop the region
+    Workbooks("utility").Activate
+    Worksheets("map").Activate
+    'loop the fee
+        'pull formula in col referened in 'd'
+    
+    
+    region = Worksheets("map").Range("B" & row).Value
+    fee = Worksheets("map").Range("A" & row).Value
+    greyref = Worksheets("map").Range("D" & row).Value
+    
+    If InStr(greyref, "+") Then
+        greyref = Mid(greyref, 1, 2)
+    End If
+    
+    If region = "APAC" Then
+    limit = 98
+    End If
+    If region = "EMEA" Then
+    limit = 237
+    End If
+    If region = "US" Then
+    limit = 534
+    End If
+    If region = "Canada" Then
+    limit = 7
+    End If
+    If region = "Japan" Then
+    limit = 20
+    End If
+    If region = "Brazil" Then
+    limit = 4
+    End If
+    
+    If fee = "Ad Assurance Fee" Then
+    feecol = "EA"
+    End If
+    If fee = "Ad Hosting / CDN / Transaction Fee" Then
+    feecol = "EB"
+    End If
+    If fee = "Ad Serving Fee" Then
+    feecol = "EC"
+    End If
+    If fee = "Clearinghouse Fee" Then
+    feecol = "ED"
+    End If
+    If fee = "Monthly Access Fee" Then
+    feecol = "EE"
+    End If
+    If fee = "Optimization Fee" Then
+    feecol = "EF"
+    End If
+    If fee = "Programmatic Buying Fee" Then
+    feecol = "EG"
+    End If
+    If fee = "Programmatic Selling Fee" Then
+    feecol = "EH"
+    End If
+    
+        If greyref <> "" Then
+            
+            Workbooks("11 Nov 2015 Platform Billing EST V2 120115").Activate
+            Worksheets(region).Activate
+        
+            Do While startRow < limit + 1
+            'Range("D" & startRow).Value <> "" And Range("D" & startRow + 1).Value <> "" And Range("D" & startRow + 2).Value <> "" And Range("D" & startRow + 3).Value <> "" And Range("D" & startRow + 4).Value <> "" And Range("D" & startRow + 5).Value <> ""
+                Range(greyref & startRow).Select
+                formulaText = ActiveCell.Formula
+                formulaText = replaceNumber(formulaText)
+                If formulaText <> "" Then
+                    formulaKey = formulaKey + "[" + Mid(formulaText, 2, Len(formulaText) - 1) + "]"
+                End If
+                consoleID = Worksheets(region).Range("K" & startRow).Value
+                'Workbooks("utility").Activate
+                'Worksheets("mapresults").Activate
+                'emptyRow = WorksheetFunction.CountA(Range("M" & inv_item_start_row & ":M2000"))
+                'emptyRow = WorksheetFunction.CountA(Range("M1:M2000"))
+                'emptyRow = emptyRow + 1
+                If formulaKey = "" Then
+                    formulaKey = "-"
+                End If
+                Range(feecol & startRow).Select
+                Worksheets(region).Range(feecol & startRow).Value = formulaKey
+               ' Worksheets(region).Range("K" & emptyRow).Value = consoleID
+            
+            startRow = startRow + 1
+            formulaKey = "-"
+            Loop
+            startRow = 2
+        End If
+    row = row + 1
+Loop
+
+
+End Sub
+
+
+
+Sub getFormula()
+
+Dim formulaText, startRow, maxRow
+
+startRow = 2
+maxRow = 340
+
+Do While startRow < maxRow + 1
+    Range("Bp" & startRow).Select
+    formulaText = ActiveCell.Formula
+    If formulaText <> "" Then
+        formulaText = Mid(formulaText, 2, Len(formulaText) - 1)
+    End If
+    Range("er" & startRow).Select
+    Range("er" & startRow).Value = formulaText
+    startRow = startRow + 1
+Loop
+
+End Sub
+
+'Attribute VB_Name = "Module1"
+Sub SheetName()
+
+Dim shtNames()
+Dim Counter, i
+Dim numShts
+Dim sht
+Dim ActSht
+Dim ActShtNum
+Counter = 2
+i = 2
+numShts = Sheets.Count
+
+ReDim shtNames(1 To numShts)
+Worksheets("sheet names").Activate
+For Each sht In Sheets
+shtNames(Counter) = sht.Name
+
+Worksheets("sheet names").Range("A" & i).Value = sht.Name
+Worksheets("sheet names").Range("B" & i).Value = Worksheets(sht.Name).Tab.ColorIndex
+
+If Worksheets(sht.Name).Tab.ColorIndex = 55 Then
+
+Dim row, col
+row = 1
+col = 1
+Do While Worksheets(sht.Name).Cells(row, col).Value <> ""
+    
+    Worksheets("sheet names").Range("C" & i).Value = Worksheets("sheet names").Range("C" & i).Value & ", " & Worksheets(sht.Name).Cells(row, col).Value
+    col = col + 1
+
+Loop
+
+End If
+
+    For Each pt In sht.PivotTables
+        
+        Worksheets("sheet names").Cells(i, 4).Value = pt.Name
+        Worksheets("sheet names").Cells(i, 5).Value = pt.SourceData
+        Worksheets("sheet names").Cells(i, 6).Value = pt.RefreshName
+        Worksheets("sheet names").Cells(i, 7).Value = pt.RefreshDate
+        Worksheets("sheet names").Cells(i, 8).Value = pt.Name
+        'Worksheets("sheet names").Cells(I, 9).Value = pt.PageFields
+        For Each pvtField In pt.PageFields
+         Worksheets("sheet names").Cells(i, 9).Value = Worksheets("sheet names").Cells(i, 9).Value & ", " & pvtField.Name
+        Next pvtField
+        
+        For Each pvtField In pt.RowFields
+         Worksheets("sheet names").Cells(i, 10).Value = Worksheets("sheet names").Cells(i, 10).Value & ", " & pvtField.Name
+        Next pvtField
+        
+        For Each pvtField In pt.DataFields
+         Worksheets("sheet names").Cells(i, 11).Value = Worksheets("sheet names").Cells(i, 11).Value & ", " & pvtField.Name
+        Next pvtField
+        
+        If sht.PivotTables.Count > 1 Then
+            i = i + 1
+        End If
+        
+    Next
+
+
+If ActiveSheet.Name = sht.Name Then
+ActSht = ActiveSheet.Name
+ActShtNum = Counter
+End If
+Counter = Counter + 1
+i = i + 1
+Next sht
+
+MsgBox shtNames(Counter - 1)
+
+End Sub
+
